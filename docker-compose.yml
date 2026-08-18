@@ -1,0 +1,51 @@
+services:
+
+  backend:
+    image: my-farm-backend:latest
+    container_name: my-farm-backend
+    restart: unless-stopped
+
+    env_file:
+      - ./backend/app/.env
+
+    ports:
+      - "8000:8000"
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    networks:
+      - farm-network
+
+
+  frontend:
+    image: my-farm-frontend:latest
+    container_name: my-farm-frontend
+    restart: unless-stopped
+
+    ports:
+      - "3000:3000"
+
+    depends_on:
+      - backend
+
+    networks:
+      - farm-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: my-farm-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - farm-network
+
+networks:
+  farm-network:
+    driver: bridge

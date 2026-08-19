@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        APP_DIR = '/home/ubuntu/my-farm-app'
-    }
-
     stages {
 
         stage('Checkout') {
@@ -25,9 +21,8 @@ pipeline {
 
         stage('Build Docker Images') {
             steps {
+                echo 'Building Docker images...'
                 sh '''
-                    cd ${APP_DIR}
-
                     docker compose build
                 '''
             }
@@ -35,10 +30,8 @@ pipeline {
 
         stage('Deploy') {
             steps {
+                echo 'Deploying application...'
                 sh '''
-                    cd ${APP_DIR}
-
-                    docker compose down
                     docker compose up -d
                 '''
             }
@@ -46,10 +39,10 @@ pipeline {
 
         stage('Verify Containers') {
             steps {
+                echo 'Checking running containers...'
                 sh '''
-                    cd ${APP_DIR}
-
                     docker compose ps
+                    docker ps
                 '''
             }
         }
